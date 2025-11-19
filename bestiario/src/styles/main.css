@@ -1,0 +1,306 @@
+/* =====================================================
+   MONSTER HUNTER WILDS — ESTÉTICA MODERNA DE CAÇADOR
+   Couro + metal + UI limpa e contrastada
+   ===================================================== */
+
+:root {
+  --couro: #2a2320;
+  --couro-light: #3a322e;
+  --couro-dark: #1d1816;
+
+  --metal: #c7c2b8;
+  --metal-dark: #8e8a82;
+  
+  --accent: #d6b078;
+  --highlight: #f0e6d2;
+
+  --text: #e8e3df;
+  --text-muted: #b9b3ae;
+
+  --shadow: rgba(0,0,0,0.45);
+
+  font-family: "Montserrat", sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* =========================================
+   BACKGROUND
+   ========================================= */
+body {
+  margin: 0;
+  background: #161413;
+  color: var(--text);
+}
+
+/* =========================================
+   TOPBAR
+   ========================================= */
+.topbar {
+  height: 70px;
+  padding: 0 22px;
+
+  background: linear-gradient(#1c1917, #161514);
+  border-bottom: 2px solid var(--metal-dark);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+
+  font-weight: 600;
+  color: var(--highlight);
+}
+
+.topnav a {
+  color: var(--highlight);
+  text-decoration: none;
+  margin-right: 15px;
+}
+.topnav a:hover {
+  color: var(--accent);
+}
+
+/* =========================================
+   HOME LAYOUT
+   ========================================= */
+.home {
+  display: flex;
+  height: calc(100vh - 70px);
+}
+
+/* =========================================
+   BARRA LATERAL — MINI CARDS
+   ========================================= */
+.left {
+  width: 180px;
+  padding: 12px;
+
+  background: var(--couro);
+  border-right: 2px solid var(--metal-dark);
+
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+  overflow-y: auto;
+}
+
+.left h3 {
+  color: var(--highlight);
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* mini-cards */
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-item {
+  background: var(--couro-light);
+  padding: 6px;
+  border-radius: 6px;
+
+  border: 2px solid var(--metal-dark);
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.menu-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  background: #443b36;
+}
+
+.menu-item.active {
+  border-color: var(--accent);
+  background: #50443f;
+}
+
+.menu-item img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.6);
+}
+
+.menu-item-name {
+  text-align: center;
+  margin-top: 6px;
+  font-weight: 600;
+  color: var(--highlight);
+}
+
+/* =========================================
+   PAINEL DA DIREITA (Detalhe do monstro)
+   ========================================= */
+.right {
+  flex: 1;
+  padding: 28px;
+
+  background: var(--couro-dark);
+  box-shadow: inset 0 0 35px rgba(0,0,0,0.7);
+
+  overflow-y: auto;
+}
+
+.panel {
+  background: var(--couro-light);
+  padding: 22px;
+
+  border-radius: 10px;
+  border: 2px solid var(--metal);
+
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.4),
+    inset 0 0 20px rgba(0,0,0,0.3);
+}
+
+.panel-img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+
+  border-radius: 8px;
+  border: 2px solid var(--metal-dark);
+
+  margin-bottom: 20px;
+}
+
+/* Título do monstro */
+.panel h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+  color: var(--highlight);
+  letter-spacing: 1px;
+}
+
+/* Descrição */
+.panel p {
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+/* =========================================
+   BOTÕES
+   ========================================= */
+.btn {
+  background: var(--metal-dark);
+  border: 2px solid var(--metal);
+  padding: 10px 16px;
+
+  color: #111;
+  font-weight: 700;
+
+  border-radius: 6px;
+  cursor: pointer;
+
+  transition: 0.15s;
+}
+
+.btn:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.btn.danger {
+  background: #8f3939;
+  border-color: #b45c5c;
+  color: #fff;
+}
+
+/* =========================================
+   FORMULÁRIOS
+   ========================================= */
+.form-card {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 25px;
+
+  background: var(--couro-light);
+  border-radius: 10px;
+
+  border: 2px solid var(--metal);
+  box-shadow:
+    0 5px 10px rgba(0,0,0,0.45),
+    inset 0 0 25px rgba(0,0,0,0.3);
+}
+
+.form-card label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  color: var(--highlight);
+}
+
+.form-card input,
+.form-card textarea,
+.form-card select {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+
+  background: #231f1d;
+  border: 2px solid var(--metal-dark);
+  color: var(--highlight);
+
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.form-card input:focus,
+.form-card textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* =========================================
+   LISTA EM GRID PARA TELA DE LISTAGEM
+   ========================================= */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: var(--couro-light);
+  border: 2px solid var(--metal-dark);
+  padding: 12px;
+  border-radius: 6px;
+
+  transition: 0.2s;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+
+.card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* =========================================
+   SCROLLBARS
+   ========================================= */
+.left::-webkit-scrollbar,
+.right::-webkit-scrollbar {
+  width: 8px;
+}
+
+.left::-webkit-scrollbar-thumb,
+.right::-webkit-scrollbar-thumb {
+  background: #544d48;
+  border-radius: 4px;
+}

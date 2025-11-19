@@ -1,0 +1,208 @@
+/* CSS Document by Dieter Schneider 2007 | Ajustado para React por Luan e ChatGPT */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/*---------------- Background body ----------------*/
+
+body {
+  background-image: url("../assets/images/body.jpg");
+  background-repeat: repeat;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 62.5%;
+}
+
+/*---------------- Main structure --------------*/
+
+#container {
+  width: 885px;
+  font-size: 1.2em;
+  background-image: url("../assets/images/container.jpg");
+  background-repeat: repeat-y;
+  margin: 0 auto;
+}
+
+#header {
+  background-image: url("../assets/images/header.jpg");
+  height: 288px;
+}
+
+#sideheader {
+  background-image: url("../assets/images/sideheader.jpg");
+  height: 576px;
+  width: 145px;
+  position: absolute;
+  left: 740px;
+  top: 0px;
+}
+
+#left_column {
+  width: 180px;
+  float: left;
+  background-image: url("../assets/images/left_column.jpg");
+  background-repeat: no-repeat;
+  margin-left: 35px;
+}
+
+.left_column_boxes {
+  border: 1px dotted #aa8661 !important;
+  border: none;
+  padding: 3px;
+  margin-bottom: 20px;
+}
+
+#content {
+  padding-right: 150px;
+  margin-left: 295px;
+}
+
+#footer {
+  padding: 20px;
+  clear: both;
+}
+
+/*----------- TEXT FORMATTING ------------- */
+
+p {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  color: #814f2c;
+}
+
+p.center {
+  text-align: center;
+  font-size: 0.8em;
+}
+
+h1 {
+  float: right;
+  margin-right: 80px;
+  margin-top: 180px;
+  font-size: 44px;
+  color: #55311b;
+}
+
+h3 {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 1.6em;
+  font-style: italic;
+  color: #926b4a;
+  text-align: center;
+}
+
+h4 {
+  color: #926b4a;
+  margin-bottom: 15px;
+}
+
+dl {
+  font-size: 0.8em;
+}
+
+dt {
+  font-size: 1.2em;
+  margin-bottom: 3px;
+  color: #666600;
+}
+
+dd {
+  margin-bottom: 15px;
+  color: #814f2c;
+}
+
+.news:first-letter {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+/*----------- LINKS --------------*/
+
+a:link,
+a:visited,
+a:active {
+  color: #666600;
+}
+
+a:hover {
+  color: #805d3f;
+}
+
+/*-------------- Navigation --------------*/
+
+#navcontainer ul {
+  list-style-type: none;
+}
+
+#navcontainer a {
+  display: block;
+  padding: 3px;
+  border-bottom: 1px solid #a47f52;
+  font-weight: bold;
+  height: 1.5em;
+}
+
+#navcontainer a:link,
+#navlist a:visited {
+  color: #65391e;
+  text-decoration: none;
+  font-style: italic;
+}
+
+#navcontainer a:hover {
+  color: #fff;
+  font-style: normal;
+  background-image: url("../assets/images/menu_hover.png") !important;
+  background-repeat: repeat;
+}
+
+/*------------ Contact form -----------------*/
+
+label {
+  font-style: italic;
+}
+
+form.contact_us {
+  width: 170px;
+}
+
+input.fields_contact_us {
+  display: block;
+  width: 170px;
+  background-image: url("../assets/images/menu_hover.png") !important;
+  background-repeat: repeat;
+  border-top: 1px solid #c0935c;
+  border-left: 1px solid #c0935c;
+  border-bottom: 1px solid #d9b17d;
+  border-right: 1px solid #d9b17d;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+textarea {
+  width: 170px;
+  background-image: url("../assets/images/menu_hover.png") !important;
+  background-repeat: repeat;
+  border-top: 1px solid #c0935c;
+  border-left: 1px solid #c0935c;
+  border-bottom: 1px solid #d9b17d;
+  border-right: 1px solid #d9b17d;
+  display: block;
+  margin-top: 3px;
+}
+
+.submit_button_contact {
+  margin-top: 15px;
+  width: 100%;
+  padding: 2px;
+  background: none;
+  cursor: pointer;
+  color: #926b4a;
+  border: none;
+  font-size: 1.8em;
+  font-weight: bold;
+  font-family: "Times New Roman", Times, serif;
+  font-style: italic;
+}
