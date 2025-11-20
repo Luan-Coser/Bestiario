@@ -1,114 +1,297 @@
-// simples mock que persiste em localStorage
-const KEY_USERS = "bestiario_users_v1";
-const KEY_MONSTERS = "bestiario_monsters_v1";
-const KEY_TYPES = "bestiario_types_v1";
+import axios from 'axios';
 
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+// Configuração da API
+const API_BASE_URL = 'http://localhost:5283/api';
 
-// inicializa se vazio
-function initIfEmpty() {
-  if (!localStorage.getItem(KEY_USERS)) {
-    const admin = { id: "u_admin", name: "Admin", email: "admin@local", passwordHash: "admin" };
-    localStorage.setItem(KEY_USERS, JSON.stringify([admin]));
+// Criar instância do axios
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json'
   }
-  if (!localStorage.getItem(KEY_TYPES)) {
-    const t = [
-      { id: "t1", name: "Flying Wyvern" },
-      { id: "t2", name: "Fanged Wyvern" }
-    ];
-    localStorage.setItem(KEY_TYPES, JSON.stringify(t));
-  }
-  if (!localStorage.getItem(KEY_MONSTERS)) {
-    const m = [
-      { id: "m1", name: "Rathalos", typeId: "t1", image: "https://via.placeholder.com/400x300?text=Rathalos", description: "Rei dos céus, fogo." },
-      { id: "m2", name: "Zinogre", typeId: "t2", image: "https://via.placeholder.com/400x300?text=Zinogre", description: "Lobo do trovão." }
-    ];
-    localStorage.setItem(KEY_MONSTERS, JSON.stringify(m));
-  }
-}
-initIfEmpty();
+});
 
-/* USERS */
+// Interceptor para adicionar token JWT em todas as requisições
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor para tratar erros de autenticação
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ==================== AUTH ====================
+export const auth = {
+  login: async (email, password) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const { token, user } = response.data;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      return { token, user };
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao fazer login');
+    }
+  },
+
+  register: async (username, email, password) => {
+    try {
+      const response = await api.post('/auth/register', { username, email, password });
+      const { token, user } = response.data;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      return { token, user };
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao registrar');
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  },
+
+  getCurrentUser: () => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  },
+
+  isAuthenticated: () => {
+    return !!localStorage.getItem('token');
+  }
+};
+
+// ==================== USERS ====================
 export const users = {
-  list: () => JSON.parse(localStorage.getItem(KEY_USERS) || "[]"),
-  create: (u) => {
-    const arr = users.list();
-    const exists = arr.find(x => x.email === u.email);
-    if (exists) throw new Error("Email já cadastrado");
-    const novo = { id: uid(), name: u.name, email: u.email, passwordHash: u.password }; // backend: hash
-    arr.push(novo);
-    localStorage.setItem(KEY_USERS, JSON.stringify(arr));
-    return novo;
+  list: async () => {
+    try {
+      const response = await api.get('/users');
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao listar usuários:', error);
+      return [];
+    }
   },
-  update: (id, payload) => {
-    const arr = users.list();
-    const idx = arr.findIndex(x => x.id === id);
-    if (idx === -1) throw new Error("Usuário não encontrado");
-    arr[idx] = { ...arr[idx], ...payload };
-    localStorage.setItem(KEY_USERS, JSON.stringify(arr));
-    return arr[idx];
+
+  get: async (id) => {
+    try {
+      const response = await api.get(`/users/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar usuário:', error);
+      return null;
+    }
   },
-  remove: (id) => {
-    let arr = users.list();
-    arr = arr.filter(x => x.id !== id);
-    localStorage.setItem(KEY_USERS, JSON.stringify(arr));
+
+  create: async (data) => {
+    try {
+      const response = await auth.register(data.name, data.email, data.password);
+      return response.user;
+    } catch (error) {
+      throw new Error(error.message || 'Erro ao criar usuário');
+    }
   },
-  login: (email, password) => {
-    const arr = users.list();
-    const u = arr.find(x => x.email === email && x.passwordHash === password);
-    if (!u) throw new Error("Credenciais inválidas");
-    // fake token
-    return { token: "fake-jwt-" + uid(), user: { id: u.id, name: u.name, email: u.email } };
+
+  update: async (id, data) => {
+    try {
+      await api.put(`/users/${id}`, {
+        id: parseInt(id),
+        username: data.name,
+        email: data.email
+      });
+      return true;
+    } catch (error) {
+      throw new Error('Erro ao atualizar usuário');
+    }
+  },
+
+  remove: async (id) => {
+    try {
+      await api.delete(`/users/${id}`);
+      return true;
+    } catch (error) {
+      throw new Error('Erro ao deletar usuário');
+    }
   }
 };
 
-/* TYPES */
+// ==================== TYPES (TIPOS) ====================
 export const types = {
-  list: () => JSON.parse(localStorage.getItem(KEY_TYPES) || "[]"),
-  create: (t) => {
-    const arr = types.list();
-    const novo = { id: uid(), name: t.name };
-    arr.push(novo);
-    localStorage.setItem(KEY_TYPES, JSON.stringify(arr));
-    return novo;
+  list: () => {
+    const cached = localStorage.getItem('tipos');
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    return [];
   },
-  update: (id, payload) => {
-    const arr = types.list();
-    const idx = arr.findIndex(x => x.id === id);
-    if (idx === -1) throw new Error("Tipo não encontrado");
-    arr[idx] = { ...arr[idx], ...payload };
-    localStorage.setItem(KEY_TYPES, JSON.stringify(arr));
-    return arr[idx];
+
+  listAsync: async () => {
+    try {
+      const response = await api.get('/tipos');
+      localStorage.setItem('tipos', JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao listar tipos:', error);
+      return [];
+    }
   },
-  remove: (id) => {
-    let arr = types.list();
-    arr = arr.filter(x => x.id !== id);
-    localStorage.setItem(KEY_TYPES, JSON.stringify(arr));
+
+  get: (id) => {
+    const list = types.list();
+    return list.find(t => t.id === parseInt(id));
+  },
+
+  create: async (data) => {
+    try {
+      const response = await api.post('/tipos', {
+        nome: data.name,
+        descricao: data.description || ''
+      });
+      
+      const list = types.list();
+      list.push(response.data);
+      localStorage.setItem('tipos', JSON.stringify(list));
+      
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao criar tipo');
+    }
+  },
+
+  update: async (id, data) => {
+    try {
+      await api.put(`/tipos/${id}`, {
+        id: parseInt(id),
+        nome: data.name,
+        descricao: data.description || ''
+      });
+      
+      const list = types.list().map(t => 
+        t.id === parseInt(id) ? { ...t, nome: data.name, descricao: data.description } : t
+      );
+      localStorage.setItem('tipos', JSON.stringify(list));
+      
+      return true;
+    } catch (error) {
+      throw new Error('Erro ao atualizar tipo');
+    }
+  },
+
+  remove: async (id) => {
+    try {
+      await api.delete(`/tipos/${id}`);
+      
+      const list = types.list().filter(t => t.id !== parseInt(id));
+      localStorage.setItem('tipos', JSON.stringify(list));
+      
+      return true;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao deletar tipo');
+    }
   }
 };
 
-/* MONSTERS */
+// ==================== MONSTERS (MONSTROS) ====================
 export const monsters = {
-  list: () => JSON.parse(localStorage.getItem(KEY_MONSTERS) || "[]"),
-  create: (m) => {
-    const arr = monsters.list();
-    const novo = { id: uid(), ...m };
-    arr.push(novo);
-    localStorage.setItem(KEY_MONSTERS, JSON.stringify(arr));
-    return novo;
+  list: () => {
+    const cached = localStorage.getItem('monstros');
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    return [];
   },
-  update: (id, payload) => {
-    const arr = monsters.list();
-    const idx = arr.findIndex(x => x.id === id);
-    if (idx === -1) throw new Error("Monstro não encontrado");
-    arr[idx] = { ...arr[idx], ...payload };
-    localStorage.setItem(KEY_MONSTERS, JSON.stringify(arr));
-    return arr[idx];
+
+  listAsync: async () => {
+    try {
+      const response = await api.get('/monstros');
+      localStorage.setItem('monstros', JSON.stringify(response.data));
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao listar monstros:', error);
+      return [];
+    }
   },
-  remove: (id) => {
-    let arr = monsters.list();
-    arr = arr.filter(x => x.id !== id);
-    localStorage.setItem(KEY_MONSTERS, JSON.stringify(arr));
+
+  get: (id) => {
+    const list = monsters.list();
+    return list.find(m => m.id === parseInt(id));
   },
-  get: (id) => monsters.list().find(x => x.id === id)
+
+  create: async (data) => {
+    try {
+      const response = await api.post('/monstros', {
+        nome: data.name,
+        tipoId: parseInt(data.typeId),
+        descricao: data.description || '',
+        imagemUrl: data.image || ''
+      });
+      
+      const list = monsters.list();
+      list.push(response.data);
+      localStorage.setItem('monstros', JSON.stringify(list));
+      
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao criar monstro');
+    }
+  },
+
+  update: async (id, data) => {
+    try {
+      await api.put(`/monstros/${id}`, {
+        id: parseInt(id),
+        nome: data.name,
+        tipoId: parseInt(data.typeId),
+        descricao: data.description || '',
+        imagemUrl: data.image || ''
+      });
+      
+      await monsters.listAsync();
+      
+      return true;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao atualizar monstro');
+    }
+  },
+
+  remove: async (id) => {
+    try {
+      await api.delete(`/monstros/${id}`);
+      
+      const list = monsters.list().filter(m => m.id !== parseInt(id));
+      localStorage.setItem('monstros', JSON.stringify(list));
+      
+      return true;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao deletar monstro');
+    }
+  }
 };
+
+// Carregar dados iniciais
+types.listAsync();
+monsters.listAsync();
+
+export default api;

@@ -4,39 +4,81 @@ import { Link } from "react-router-dom";
 
 export default function ListaMonstros() {
   const [list, setList] = useState([]);
+  const [typeMap, setTypeMap] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     refresh();
   }, []);
 
-  function refresh() {
-    setList(monsters.list());
+  async function refresh() {
+    setLoading(true);
+    try {
+      const [monsterList, typeList] = await Promise.all([
+        monsters.listAsync(),
+        types.listAsync()
+      ]);
+      
+      setList(monsterList);
+      setTypeMap(Object.fromEntries(typeList.map(t => [t.id, t.nome])));
+    } catch (err) {
+      console.error("Erro ao carregar dados:", err);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function del(id) {
+  async function del(id) {
     if (!confirm("Excluir monstro?")) return;
-    monsters.remove(id);
-    refresh();
+    
+    try {
+      await monsters.remove(id);
+      refresh();
+    } catch (err) {
+      alert(err.message || "Erro ao deletar monstro");
+    }
   }
 
-  const typeMap = Object.fromEntries(types.list().map(t => [t.id, t.name]));
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <div>
-      <h2>Monstros</h2>
-      <div className="grid">
-        {list.map(m => (
-          <div className="card" key={m.id}>
-            <img src={m.image || `https://via.placeholder.com/300x200?text=${encodeURIComponent(m.name)}`} alt={m.name} />
-            <h3>{m.name}</h3>
-            <p className="muted">{typeMap[m.typeId]}</p>
-            <div className="card-actions">
-              <Link to={`/cadastro-monstro?edit=${m.id}`} className="btn small">Editar</Link>
-              <button className="btn small danger" onClick={() => del(m.id)}>Excluir</button>
-            </div>
-          </div>
-        ))}
-      </div>
+      <h1>Monstros</h1>
+      <Link to="/monstros/cadastro">Novo Monstro</Link>
+      <table>
+        <thead>
+          <tr>
+            <th>Imagem</th>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((m) => (
+            <tr key={m.id}>
+              <td>
+                {m.imagemUrl && (
+                  <img 
+                    src={m.imagemUrl} 
+                    alt={m.nome} 
+                    style={{ width: 50, height: 50, objectFit: "cover" }} 
+                  />
+                )}
+              </td>
+              <td>{m.nome}</td>
+              <td>{typeMap[m.tipoId] || "N/A"}</td>
+              <td>
+                <Link to={`/monstros/cadastro?edit=${m.id}`}>Editar</Link>
+                {" | "}
+                <button onClick={() => del(m.id)}>Deletar</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

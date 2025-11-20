@@ -1,39 +1,53 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { users } from "../api/api";
+import { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../api/api';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const s = localStorage.getItem("bestiario_auth_user");
-    return s ? JSON.parse(s) : null;
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) localStorage.setItem("bestiario_auth_user", JSON.stringify(user));
-    else localStorage.removeItem("bestiario_auth_user");
-  }, [user]);
+    const currentUser = auth.getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
+    }
+    setLoading(false);
+  }, []);
 
-  function login(email, password) {
-    const res = users.login(email, password);
-    setUser(res.user);
-    // store token if needed
-    localStorage.setItem("bestiario_token", res.token);
-    return res;
-  }
+  const login = async (email, password) => {
+    try {
+      const { user: loggedUser } = await auth.login(email, password);
+      setUser(loggedUser);
+      return loggedUser;
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  function logout() {
+  const logout = () => {
+    auth.logout();
     setUser(null);
-    localStorage.removeItem("bestiario_token");
+  };
+
+  const value = {
+    user,
+    login,
+    logout,
+    isAuthenticated: !!user
+  };
+
+  if (loading) {
+    return <div>Carregando...</div>;
   }
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth deve ser usado dentro de AuthProvider');
+  }
+  return context;
 }

@@ -1,102 +1,108 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// Pages
+import Login from "./pages/Login";
 import Home from "./pages/Home";
 import CadastroMonstro from "./pages/CadastroMonstro";
 import ListaMonstros from "./pages/ListaMonstros";
-import CadastroPessoa from "./pages/CadastroPessoa";
-import ListaPessoas from "./pages/ListaPessoas";
 import CadastroTipo from "./pages/CadastroTipo";
 import ListaTipos from "./pages/ListaTipos";
-import Login from "./pages/Login.jsx";
-import { useAuth } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import CadastroPessoa from "./pages/CadastroPessoa";
+import ListaPessoas from "./pages/ListaPessoas";
+
+// Componente para redirecionar a rota raiz
+function RootRedirect() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Home /> : <Navigate to="/login" replace />;
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Rota raiz - redireciona para login se não autenticado */}
+      <Route path="/" element={<RootRedirect />} />
+      
+      {/* Rota pública */}
+      <Route path="/login" element={<Login />} />
+      
+      {/* Rotas protegidas - Home */}
+      <Route 
+        path="/home" 
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Rotas protegidas - Monstros */}
+      <Route 
+        path="/monstros" 
+        element={
+          <ProtectedRoute>
+            <ListaMonstros />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/monstros/cadastro" 
+        element={
+          <ProtectedRoute>
+            <CadastroMonstro />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Rotas protegidas - Tipos */}
+      <Route 
+        path="/tipos" 
+        element={
+          <ProtectedRoute>
+            <ListaTipos />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/tipos/cadastro" 
+        element={
+          <ProtectedRoute>
+            <CadastroTipo />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Rotas protegidas - Usuários */}
+      <Route 
+        path="/usuarios" 
+        element={
+          <ProtectedRoute>
+            <ListaPessoas />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/usuarios/cadastro" 
+        element={
+          <ProtectedRoute>
+            <CadastroPessoa />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Rota 404 */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
 
 export default function App() {
-  const { user, logout } = useAuth();
-
   return (
-    <div className="app">
-      <header className="topbar">
-        <div className="brand">Bestiário MH</div>
-
-        <nav className="topnav">
-          <Link to="/">Home</Link>
-          <Link to="/monstros">Monstros</Link>
-          <Link to="/cadastro-monstro">Cadastrar Monstro</Link>
-          <Link to="/tipos">Tipos</Link>
-          <Link to="/cadastro-tipo">Cadastrar Tipo</Link>
-          <Link to="/usuarios">Pessoas</Link>
-          <Link to="/cadastro-pessoa">Cadastrar Pessoa</Link>
-        </nav>
-
-        <div className="auth-area">
-          {user ? (
-            <>
-              <span className="user-label">Olá, {user.name}</span>
-              <button className="btn small" onClick={logout}>Sair</button>
-            </>
-          ) : (
-            <Link to="/login" className="btn small">Login</Link>
-          )}
-        </div>
-      </header>
-
-      <main className="main-area">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-
-          <Route
-            path="/cadastro-pessoa"
-            element={
-              <ProtectedRoute>
-                <CadastroPessoa />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/usuarios"
-            element={
-              <ProtectedRoute>
-                <ListaPessoas />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/cadastro-monstro"
-            element={
-              <ProtectedRoute>
-                <CadastroMonstro />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/monstros"
-            element={
-              <ProtectedRoute>
-                <ListaMonstros />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/cadastro-tipo"
-            element={
-              <ProtectedRoute>
-                <CadastroTipo />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tipos"
-            element={
-              <ProtectedRoute>
-                <ListaTipos />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </main>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }

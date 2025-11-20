@@ -6,32 +6,55 @@ export default function CadastroPessoa() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const nav = useNavigate();
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
+    setMsg("");
+    setLoading(true);
+
     try {
-      users.create({ name, email, password });
-      setMsg("Usuário criado.");
-      setTimeout(() => nav("/usuarios"), 600);
+      await users.create({ name, email, password });
+      setMsg("Usuário criado com sucesso!");
+      setTimeout(() => nav("/usuarios"), 1000);
     } catch (err) {
-      setMsg(err.message);
+      setMsg(err.message || "Erro ao criar usuário");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="form-card">
-      <h2>Cadastrar Pessoa</h2>
-      {msg && <div className="info">{msg}</div>}
+    <div>
+      <h1>Novo Usuário</h1>
       <form onSubmit={submit}>
-        <label>Nome</label>
-        <input value={name} onChange={e => setName(e.target.value)} />
-        <label>E-mail</label>
-        <input value={email} onChange={e => setEmail(e.target.value)} />
-        <label>Senha</label>
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button className="btn">Cadastrar</button>
+        <input
+          type="text"
+          placeholder="Nome"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Criando..." : "Criar"}
+        </button>
+        {msg && <p style={{ color: msg.includes("sucesso") ? "green" : "red" }}>{msg}</p>}
       </form>
     </div>
   );
