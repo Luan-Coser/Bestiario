@@ -165,21 +165,48 @@ export const types = {
 
   create: async (data) => {
     try {
-      const response = await api.post('/tipos', {
-        nome: data.name,
-        descricao: data.description || ''
-      });
+      console.log('📤 1. Dados recebidos do formulário:', data);
       
+      // Validação
+      if (!data.name || data.name.trim() === '') {
+        throw new Error('Nome do tipo é obrigatório');
+      }
+
+      const payload = {
+        nome: data.name.trim(),
+        descricao: data.description?.trim() || ''
+      };
+
+      console.log('📤 2. Payload que será enviado:', payload);
+      console.log('📤 3. URL completa:', `${api.defaults.baseURL}/tipos`);
+
+      const response = await api.post('/tipos', payload);
+      
+      console.log('✅ 4. Resposta do backend (sucesso):', response.data);
+      
+      // Atualizar cache
       const list = types.list();
       list.push(response.data);
       localStorage.setItem('tipos', JSON.stringify(list));
       
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Erro ao criar tipo');
+      console.error('❌ 5. ERRO COMPLETO:', error);
+      console.error('❌ 6. Resposta do servidor:', error.response);
+      console.error('❌ 7. Status HTTP:', error.response?.status);
+      console.error('❌ 8. Dados do erro:', error.response?.data);
+      console.error('❌ 9. Headers da resposta:', error.response?.headers);
+      
+      const errorMessage = error.response?.data?.errors 
+        ? JSON.stringify(error.response.data.errors)
+        : error.response?.data?.message 
+        || error.response?.data?.title 
+        || 'Erro ao criar tipo';
+      
+      throw new Error(errorMessage);
     }
   },
-
+  
   update: async (id, data) => {
     try {
       await api.put(`/tipos/${id}`, {

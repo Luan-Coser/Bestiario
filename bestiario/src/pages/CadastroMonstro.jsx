@@ -1,7 +1,41 @@
 import { useState, useEffect } from "react";
 import { types, monsters } from "../api/api";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
+function Header() {
+  const { user, logout } = useAuth();
+  const nav = useNavigate();
+
+  function handleLogout() {
+    logout();
+    nav("/login");
+  }
+
+  return (
+    <header>
+      <div>
+        <h2>
+          <a href="/home">⚔️ BESTIÁRIO ⚔️</a>
+        </h2>
+        <nav>
+          <a href="/home">🏠 Início</a>
+          <a href="/monstros">🐉 Monstros</a>
+          <a href="/tipos">🏷️ Tipos</a>
+          <a href="/usuarios">👥 Usuários</a>
+          
+          <span className="divider">|</span>
+          
+          <div className="user-info">
+            <span>👤 {user?.username || "Caçador"}</span>
+          </div>
+          
+          <button onClick={handleLogout}>🚪 Sair</button>
+        </nav>
+      </div>
+    </header>
+  );
+}
 export default function CadastroMonstro() {
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
@@ -66,45 +100,67 @@ export default function CadastroMonstro() {
   }
 
   return (
-    <div>
-      <h1>{editId ? "Editar Monstro" : "Novo Monstro"}</h1>
-      <form onSubmit={submit}>
-        <input
-          type="text"
-          placeholder="Nome"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="URL da Imagem"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
-        />
-        <textarea
-          placeholder="Descrição"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-        />
-        <select
-          value={typeId}
-          onChange={(e) => setTypeId(e.target.value)}
-          required
-        >
-          <option value="">Selecione um tipo</option>
-          {typeList.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.nome}
-            </option>
-          ))}
-        </select>
-        <button type="submit" disabled={loading}>
-          {loading ? "Salvando..." : "Salvar"}
-        </button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-      </form>
-    </div>
+    <>
+      <Header />
+      <div className="page-container">
+        <h1>{editId ? "✏️ Editar Criatura" : "➕ Nova Criatura"}</h1>
+        
+        <form onSubmit={submit}>
+          <label>Nome da Criatura:</label>
+          <input
+            type="text"
+            placeholder="Ex: Rathalos"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+
+          <label>URL da Imagem:</label>
+          <input
+            type="text"
+            placeholder="https://exemplo.com/imagem.jpg"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+          />
+
+          <label>Tipo:</label>
+          <select
+            value={typeId}
+            onChange={(e) => setTypeId(e.target.value)}
+            required
+          >
+            <option value="">Selecione um tipo</option>
+            {typeList.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.nome}
+              </option>
+            ))}
+          </select>
+
+          <label>Descrição:</label>
+          <textarea
+            placeholder="Descreva a criatura (suporta Markdown)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={8}
+          />
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+            <button type="submit" disabled={loading} style={{ flex: 1 }}>
+              {loading ? "Salvando..." : editId ? "💾 Atualizar" : "💾 Salvar"}
+            </button>
+            <button 
+              type="button" 
+              onClick={() => navigate("/monstros")}
+              style={{ flex: 1, background: "#8b6f47" }}
+            >
+              ❌ Cancelar
+            </button>
+          </div>
+
+          {error && <p className="error">{error}</p>}
+        </form>
+      </div>
+    </>
   );
 }

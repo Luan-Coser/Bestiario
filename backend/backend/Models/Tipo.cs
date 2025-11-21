@@ -13,6 +13,6 @@ namespace BestiarioAPI.Models
         [MaxLength(200)]
         public string Descricao { get; set; }
 
-        public ICollection<Monstro> Monstros { get; set; }
+        public ICollection<Monstro> Monstros { get; set; } = new List<Monstro>();
     }
 }

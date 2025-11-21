@@ -1,68 +1,384 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  --parchment: #f4e8d0;
+  --parchment-dark: #e8d5b7;
+  --ink: #3d2817;
+  --ink-light: #5c4033;
+  --gold: #d4af37;
+  --gold-dark: #b8941e;
+  --border: #8b6f47;
+  --shadow: rgba(61, 40, 23, 0.3);
+  --red-accent: #8b1a1a;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  font-family: 'IM Fell English', serif;
+  background: linear-gradient(135deg, #2c2416 0%, #4a3f35 100%);
+  color: var(--ink);
   min-height: 100vh;
+  background-attachment: fixed;
+  line-height: 1.6;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+#root {
+  position: relative;
+  z-index: 2;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Cinzel', serif;
+  color: var(--ink);
+  text-shadow: 1px 1px 2px rgba(212, 175, 55, 0.3);
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: 2px;
+  text-align: center;
+  border-bottom: 3px double var(--gold);
+  padding-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 0.3rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--gold-dark);
+}
+
+a {
+  color: var(--red-accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-family: 'Cinzel', serif;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: var(--ink);
+  border: 2px solid var(--border);
+  padding: 10px 20px;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  box-shadow: 
+    0 4px 6px var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+button:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 12px var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 4px var(--shadow),
+    inset 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input, textarea, select {
+  font-family: 'IM Fell English', serif;
+  background: var(--parchment);
+  border: 2px solid var(--border);
+  padding: 10px 15px;
+  font-size: 1rem;
+  color: var(--ink);
+  width: 100%;
+  margin-bottom: 15px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--parchment);
+  border: 3px solid var(--border);
+  box-shadow: 0 4px 8px var(--shadow);
+}
+
+thead {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+}
+
+th {
+  font-family: 'Cinzel', serif;
+  padding: 15px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--parchment-dark);
+}
+
+tr:hover {
+  background: var(--parchment-dark);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.page-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 40px;
+  background: var(--parchment);
+  border: 4px solid var(--border);
+  box-shadow: 
+    0 10px 30px var(--shadow),
+    inset 0 0 100px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.page-container::before,
+.page-container::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--gold);
+}
+
+.page-container::before {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.page-container::after {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px;
+  font-size: 1.5rem;
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+}
+
+.error {
+  background: #fdecea;
+  border: 2px solid var(--red-accent);
+  color: var(--red-accent);
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.success {
+  background: #e8f5e9;
+  border: 2px solid #4caf50;
+  color: #2e7d32;
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 4px;
+  font-weight: 600;
+}
+/* ========== HEADER HORIZONTAL LIMPO ========== */
+header {
+  background: #2c2416;
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header > div {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  gap: 30px;
+}
+
+header h2 {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 1.8rem;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+header h2 a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+header h2 a:hover {
+  color: #fff;
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+header nav a {
+  color: #ffffff;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  padding: 8px 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+header nav a:hover {
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.15);
+}
+
+header button {
+  background: #8b1a1a;
+  border: 2px solid #6b1414;
+  color: #f4e8d0;
+  padding: 10px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  transition: all 0.3s;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+header button:hover {
+  background: #a82020;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Remove estilos desnecessários */
+header .divider,
+header .user-info {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  header > div {
+    padding: 0 20px;
+    gap: 15px;
   }
-  a:hover {
-    color: #747bff;
+
+  header h2 {
+    font-size: 1.4rem;
   }
-  button {
-    background-color: #f9f9f9;
+
+  header nav {
+    gap: 15px;
+  }
+
+  header nav a {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  header > div {
+    height: auto;
+    flex-direction: column;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  header nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }

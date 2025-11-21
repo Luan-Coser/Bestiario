@@ -17,7 +17,7 @@ export default function Login() {
 
     try {
       await login(email, password);
-      nav("/home"); // Redireciona para /home após login
+      nav("/home");
     } catch (err) {
       setError(err.message || "Erro ao fazer login");
     } finally {
@@ -26,41 +26,31 @@ export default function Login() {
   }
 
   return (
-    <div style={{ maxWidth: "400px", margin: "100px auto", padding: "20px" }}>
-      <h1>Login - Bestiário</h1>
-      <form onSubmit={handle}>
-        <div style={{ marginBottom: "15px" }}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: "100%", padding: "10px" }}
-          />
-        </div>
-        <div style={{ marginBottom: "15px" }}>
-          <input
-            type="password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: "100%", padding: "10px" }}
-          />
-        </div>
-        <button 
-          type="submit" 
-          disabled={loading}
-          style={{ width: "100%", padding: "10px" }}
-        >
-          {loading ? "Entrando..." : "Entrar"}
-        </button>
-        {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
-      </form>
-      <p style={{ marginTop: "20px", textAlign: "center" }}>
-        Não tem conta? <a href="/usuarios/cadastro">Cadastre-se</a>
+    <div className="login-container">
+      <h1>⚔️ Bestiário ⚔️</h1>
+      <p style={{ textAlign: "center", marginBottom: "30px", fontStyle: "italic" }}>
+        Entre para acessar o compêndio de criaturas
       </p>
+      <form onSubmit={handle}>
+        <input
+          type="email"
+          placeholder="Email do Caçador"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Senha Secreta"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Acessando..." : "Entrar"}
+        </button>
+        {error && <p className="error" style={{ marginTop: "15px" }}>{error}</p>}
+      </form>
     </div>
   );
 }
