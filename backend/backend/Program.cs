@@ -5,16 +5,17 @@ using System.Text;
 using BestiarioAPI.Data;
 using BestiarioAPI.Services;
 
+// 1. CONFIGURAÇÃO PRINCIPAL DO ASP.NET
 var builder = WebApplication.CreateBuilder(args);
 
-// Database
+// 2. Configuração do banco de dados
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Services
+// 3. TokenService para JWT
 builder.Services.AddScoped<TokenService>();
 
-// JWT Authentication
+// 4. Autenticação JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -31,17 +32,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// CORS - CONFIGURAÇÃO AMPLA PARA DESENVOLVIMENTO
+// 5. CORS - Permite seu front de produção e localhost:5173 (React/Vite)
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy
+            .WithOrigins(
+                "https://luan.starvingdevelopers.tech", // seu domínio de produção
+                "http://localhost:5173"                 // porta padrão do Vite/React local
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
+// 6. Controllers e Serialização
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -53,14 +59,11 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger sempre disponível
+// 7. SWAGGER SEMPRE DISPONÍVEL
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// REMOVER HTTPS redirection em desenvolvimento
-// app.UseHttpsRedirection();
-
-// CORS deve vir ANTES de Authentication
+// 8. Habilita CORS antes do Auth
 app.UseCors();
 
 app.UseAuthentication();
@@ -68,6 +71,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// 9. Endpoint de healthcheck para teste rápido
 app.MapGet("/health", async (AppDbContext db) =>
 {
     try
@@ -81,8 +85,12 @@ app.MapGet("/health", async (AppDbContext db) =>
     }
 });
 
+// 10. Garanta que o backend vai ouvir em todas as interfaces (0.0.0.0) na porta correta (Render, VPS, etc)
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5283";
+app.Urls.Add($"http://0.0.0.0:{port}");
+
 Console.WriteLine("🚀 API Bestiário rodando!");
-Console.WriteLine($"📍 Swagger: http://localhost:{builder.Configuration["ASPNETCORE_URLS"]?.Split(':').Last() ?? "5283"}/swagger");
-Console.WriteLine($"📍 Health: http://localhost:{builder.Configuration["ASPNETCORE_URLS"]?.Split(':').Last() ?? "5283"}/health");
+Console.WriteLine($"📍 Health: http://localhost:{port}/health");
+Console.WriteLine($"📍 Swagger: http://localhost:{port}/swagger");
 
 app.Run();

@@ -38,7 +38,7 @@ api.interceptors.response.use(
   }
 );
 
-// ==================== AUTH ====================
+// Parte de Autenticação
 export const auth = {
   login: async (email, password) => {
     try {
@@ -83,7 +83,7 @@ export const auth = {
   }
 };
 
-// ==================== USERS ====================
+// Parte de USUÁRIOS
 export const users = {
   list: async () => {
     try {
@@ -137,7 +137,7 @@ export const users = {
   }
 };
 
-// ==================== TYPES (TIPOS) ====================
+// Parte de TIPOS
 export const types = {
   list: () => {
     const cached = localStorage.getItem('tipos');
@@ -165,7 +165,7 @@ export const types = {
 
   create: async (data) => {
     try {
-      console.log('📤 1. Dados recebidos do formulário:', data);
+      console.log(' 1. Dados recebidos do formulário:', data);
       
       // Validação
       if (!data.name || data.name.trim() === '') {
@@ -177,12 +177,12 @@ export const types = {
         descricao: data.description?.trim() || ''
       };
 
-      console.log('📤 2. Payload que será enviado:', payload);
-      console.log('📤 3. URL completa:', `${api.defaults.baseURL}/tipos`);
+      console.log(' 2. Payload que será enviado:', payload);
+      console.log(' 3. URL completa:', `${api.defaults.baseURL}/tipos`);
 
       const response = await api.post('/tipos', payload);
       
-      console.log('✅ 4. Resposta do backend (sucesso):', response.data);
+      console.log(' 4. Resposta do backend (sucesso):', response.data);
       
       // Atualizar cache
       const list = types.list();
@@ -191,11 +191,11 @@ export const types = {
       
       return response.data;
     } catch (error) {
-      console.error('❌ 5. ERRO COMPLETO:', error);
-      console.error('❌ 6. Resposta do servidor:', error.response);
-      console.error('❌ 7. Status HTTP:', error.response?.status);
-      console.error('❌ 8. Dados do erro:', error.response?.data);
-      console.error('❌ 9. Headers da resposta:', error.response?.headers);
+      console.error(' 5. ERRO COMPLETO:', error);
+      console.error(' 6. Resposta do servidor:', error.response);
+      console.error(' 7. Status HTTP:', error.response?.status);
+      console.error(' 8. Dados do erro:', error.response?.data);
+      console.error(' 9. Headers da resposta:', error.response?.headers);
       
       const errorMessage = error.response?.data?.errors 
         ? JSON.stringify(error.response.data.errors)
@@ -240,7 +240,7 @@ export const types = {
   }
 };
 
-// ==================== MONSTERS (MONSTROS) ====================
+// Parte de MONSTROS
 export const monsters = {
   list: () => {
     const cached = localStorage.getItem('monstros');

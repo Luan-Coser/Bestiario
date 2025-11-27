@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-// Barra vertical de ícones
+// Barra lateral com os monstros
 function SidebarIcons({ monsters, active, setActive }) {
   return (
     <div className="home-sidebar-icons">

@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using BestiarioAPI.Data;
 using BestiarioAPI.DTOs;
 using BestiarioAPI.Models;
-using BestiarioAPI.Data;
 using BestiarioAPI.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BestiarioAPI.Controllers
 {
@@ -52,7 +53,25 @@ namespace BestiarioAPI.Controllers
                 }
             });
         }
+        [HttpPost("seed-admin")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SeedAdmin([FromServices] AppDbContext db)
+        {
+            if (await db.Users.AnyAsync())
+                return BadRequest(new { message = "Já existe usuário cadastrado." });
 
+            var user = new User
+            {
+                Username = "admin",
+                Email = "admin@bestiario.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123")
+            };
+
+            db.Users.Add(user);
+            await db.SaveChangesAsync();
+
+            return Ok(new { message = "Usuário admin criado.", email = user.Email, senha = "admin123" });
+        }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO dto)
         {
