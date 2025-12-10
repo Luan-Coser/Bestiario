@@ -255,6 +255,8 @@ Relacionamentos:
   (um Tipo pode estar ligado a muitos Monstros, cada Monstro pertence a um Tipo)
 
 
+<img width="397" height="402" alt="image" src="https://github.com/user-attachments/assets/8a4cf5a9-19a7-43a7-b228-b666fb75569a" />
+
 
 
 
