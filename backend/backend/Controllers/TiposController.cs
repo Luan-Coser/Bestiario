@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BestiarioAPI.Data;
 using BestiarioAPI.Models;
+using backend.Services;
 
 namespace BestiarioAPI.Controllers
 {
@@ -11,10 +12,11 @@ namespace BestiarioAPI.Controllers
     public class TiposController : ControllerBase
     {
         private readonly AppDbContext _context;
-
-        public TiposController(AppDbContext context)
+        private IServiceTipo _serviceTipo;
+        public TiposController(AppDbContext context, IServiceTipo serviceTipo )
         {
             _context = context;
+            _serviceTipo = serviceTipo;
         }
 
         // GET: api/Tipos

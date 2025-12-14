@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BestiarioAPI.Data;
 using BestiarioAPI.Models;
+using Microsoft.AspNetCore.Identity;
+using backend.Services;
 
 namespace BestiarioAPI.Controllers
 {
@@ -10,34 +12,30 @@ namespace BestiarioAPI.Controllers
     [ApiController]
     public class MonstrosController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public MonstrosController(AppDbContext context)
+        private IServiceMonstro _serviceMonstro;
+        public MonstrosController(IServiceMonstro serviceMonstro)
         {
-            _context = context;
+            _serviceMonstro = serviceMonstro;
         }
 
         // GET: api/Monstros
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Monstro>>> GetMonstros()
         {
-            return await _context.Monstros
-                .Include(m => m.Tipo)
-                .ToListAsync();
+            var monstros = await _serviceMonstro.GetAllAsync();
+            return Ok(monstros);
+
         }
 
         // GET: api/Monstros/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Monstro>> GetMonstro(int id)
         {
-            var monstro = await _context.Monstros
-                .Include(m => m.Tipo)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (monstro == null)
+            var monstro = await _serviceMonstro.GetByIdAsync(id);
+            if (monstro is null)
                 return NotFound();
 
-            return monstro;
+            return Ok(monstro);
         }
 
         // POST: api/Monstros
@@ -47,21 +45,17 @@ namespace BestiarioAPI.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            try
+            {
+                monstro = await _serviceMonstro.AddAsync(monstro);
+                return CreatedAtAction(nameof(GetMonstro), new { id = monstro.Id }, monstro);
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "Tipo não encontrado")
+            {
+                return BadRequest(new { message = ex.Message });
+            }
 
-            // Verifica se o tipo existe
-            var tipoExists = await _context.Tipos.AnyAsync(t => t.Id == monstro.TipoId);
-            if (!tipoExists)
-                return BadRequest(new { message = "Tipo não encontrado" });
-
-            _context.Monstros.Add(monstro);
-            await _context.SaveChangesAsync();
-
-            // Recarrega com o tipo incluído
-            await _context.Entry(monstro).Reference(m => m.Tipo).LoadAsync();
-
-            return CreatedAtAction(nameof(GetMonstro), new { id = monstro.Id }, monstro);
         }
-
         // PUT: api/Monstros/5
         [Authorize]
         [HttpPut("{id}")]
@@ -69,17 +63,17 @@ namespace BestiarioAPI.Controllers
         {
             if (id != monstro.Id)
                 return BadRequest();
-
-            // Verifica se o tipo existe
-            var tipoExists = await _context.Tipos.AnyAsync(t => t.Id == monstro.TipoId);
-            if (!tipoExists)
-                return BadRequest(new { message = "Tipo não encontrado" });
-
-            _context.Entry(monstro).State = EntityState.Modified;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _serviceMonstro.UpdateAsync(monstro);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -87,8 +81,6 @@ namespace BestiarioAPI.Controllers
                     return NotFound();
                 throw;
             }
-
-            return NoContent();
         }
 
         // DELETE: api/Monstros/5
@@ -96,19 +88,20 @@ namespace BestiarioAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMonstro(int id)
         {
-            var monstro = await _context.Monstros.FindAsync(id);
-            if (monstro == null)
-                return NotFound();
-
-            _context.Monstros.Remove(monstro);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            try
+            {
+               await _serviceMonstro.DeleteAsync(id);
+               return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         private bool MonstroExists(int id)
         {
-            return _context.Monstros.Any(e => e.Id == id);
+            return _serviceMonstro.MonstroExists(id);
         }
     }
 }

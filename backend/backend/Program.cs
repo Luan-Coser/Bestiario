@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+﻿using backend.DAO;
+using backend.Services;
 using BestiarioAPI.Data;
 using BestiarioAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 // 1. CONFIGURAÇÃO PRINCIPAL DO ASP.NET
 var builder = WebApplication.CreateBuilder(args);
@@ -56,6 +58,10 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IMonstroRepository, MonstroRepository>();
+builder.Services.AddScoped<IServiceMonstro, ServiceMonstros>();
+builder.Services.AddScoped<IServiceTipo, ServiceTipo>();
+builder.Services.AddScoped<ITipo, TipoRepository>();
 
 var app = builder.Build();
 
